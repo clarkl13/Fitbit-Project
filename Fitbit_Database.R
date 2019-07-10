@@ -1,20 +1,17 @@
----
-title: <center> Update Fitbit Database </center>
-output: 
-  html_document:
-    theme: spacelab
----
+#Update Fitbit Database 
 
-```{r setup, message=FALSE, warning=FALSE, echo=FALSE}
+#=======================================================================================================================
+
 # libraries
 if (!require("pacman")){install.packages("pacman")} else {library(pacman)}
 
-pacman::p_load(DT, knitr, kableExtra, pander, RMariaDB, fs, httr, RMySQL, DBI, odbc, jsonlite, lubridate, devtools, fitbitr, tidyverse)
+pacman::p_load(DT, knitr, kableExtra, pander, RMariaDB, fs, httr, RMySQL, DBI, odbc, jsonlite, lubridate, devtools, 
+               fitbitr, tidyverse)
 
-```
+options(scipen = 999)
 
-```{r DB, message=FALSE, warning=FALSE, echo=FALSE }
-# load in database function
+
+# load in database function---------------------------------------------------------------------------------------------
 source("Rcode/RDS_connect.R") 
 # functions:  connectDB returns DB connection to my AWS RDS fitbit DB
 #             getDataTable returns last date of data entered into table in DF
@@ -31,12 +28,8 @@ last_entered_dates <- lapply(tables, getTableDate)
 last_entered_dates <- bind_rows(last_entered_dates)
 last_entered_dates$table <- tables
 
-options(scipen = 999)
 
-```
-
-```{r fitbit API, message=FALSE, warning=FALSE, echo=FALSE}
-# load in functions for accessing fitbit API
+# load in functions for accessing fitbit API----------------------------------------------------------------------------
 source("Rcode/fitbitAPI.R")
 # functions:  getToken connects to fitbit API 
 #             getActivityData returns DF of activity data
@@ -96,11 +89,8 @@ updateDB <- apply(last_entered_dates, 1, function(x){
 
 })
 
-```
 
-```{r db diagnostics, message=FALSE, warning=FALSE, echo=FALSE}
-
-# get status info from each table in DB
+# get status info from each table in DB---------------------------------------------------------------------------------
 status_info <- lapply(tables, GetTableInfo)
 
 # bind rows into DF reformat and only keep variable we care about
@@ -120,4 +110,3 @@ db_table_info %>%
 
 
 
-```

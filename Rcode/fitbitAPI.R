@@ -154,8 +154,7 @@ getActivityData <- function(dates){
   
 }  
 
-# Remove local variables------------------------------------------------------------------------------------------------
-rm(FITBIT_CALLBACK, FITBIT_KEY, FITBIT_SECRET)
+
 
 
 
