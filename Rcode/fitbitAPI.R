@@ -1,12 +1,13 @@
-#=============================================================================================================
 # functions to pull data from fitbit API
-#==============================================================================================================
+
+#=======================================================================================================================
 
 # Fibit API KEY & SECRET INFO
 FITBIT_KEY  <- " "
 FITBIT_SECRET <- " "
 FITBIT_CALLBACK <- " "
 
+# Where you would insert your API info.
 source("Rcode/fitbit_keys.R")
 
 # Get token
@@ -15,8 +16,8 @@ getToken <- function(){
                                 secret = FITBIT_SECRET,
                                 callback = FITBIT_CALLBACK)
   return(token)
+  
 }  
-
 
 # Download data from API------------------------------------------------------------------------------------------------
 # code was adpted from https://www.r-bloggers.com/downloading-fitbit-data-histories-with-r/
@@ -28,7 +29,9 @@ getStepsData <- function(dates){
   #loop over vector of dates to download steps data returns list of dataframe
   steps <- lapply(dates, function(x){
     steps_dflist <- fitbitr::get_activity_intraday_time_series(token, "steps", x, detail_level="1min")
+    
     return(steps_dflist)
+    
   })
   
   #bind the list of dataframes to create 1 DF
@@ -36,11 +39,12 @@ getStepsData <- function(dates){
   steps <- rename(steps, date = dateTime)
   steps <- steps %>%
     mutate(value = as.numeric(value), datasetType = as.character(datasetType))
+  
   return(steps)
+  
 }
 
-#-----------------------------------------------------------------------------------------------------------------------
-# download heart rate data using the fitbitr library
+# download heart rate data using the fitbitr library--------------------------------------------------------------------
 # (colnames)sec in day, time, heart rate, date 
 getHeartRateData <- function(dates){  
   token <- getToken()
@@ -54,14 +58,16 @@ getHeartRateData <- function(dates){
       mutate(., heart_rate = as.numeric(heart_rate))
     
     return(df)
+    
   })
   
   #bind the list of dataframes to create 1 DF
   heart_rate <- bind_rows(heart_rate)
+  
   return(heart_rate)
-}  
-#-----------------------------------------------------------------------------------------------------------------------
-# download calories burned per day data by 1 minute increment
+}
+
+# download calories burned per day data by 1 minute increment-----------------------------------------------------------
 # col names dateTime,	value, dataset_level, dataset_mets, dataset_time,	dataset_value,
 # datasetInterval, datasetType
 getCalorieData <- function(dates){
@@ -71,18 +77,21 @@ getCalorieData <- function(dates){
   cals <- lapply(dates, function(x){
     df <- get_activity_intraday_time_series(token, "calories", date = x, detail_level = "1min")
     df <- rename(df, date = dateTime)
+    
     return(df)
+    
   })
   
   #bind the list of dataframes to create 1 DF
   cals <- bind_rows(cals)
   cals$value <- as.numeric(cals$value)
   cals$datasetType <- as.numeric(cals$datasetType)
+  
   return(cals)
+  
 }  
   
-#-----------------------------------------------------------------------------------------------------------------------
-# download weight data one day at a time
+# download weight data one day at a time--------------------------------------------------------------------------------
 getWeightData <- function(dates){
   token <- getToken()
   
@@ -94,17 +103,21 @@ getWeightData <- function(dates){
     
     # return DF of weight
     df <- df$weight
+    
     return(df)
+    
 })
+  
   # bind togther all lists of DF to make one DF of dates requested
   weight <- bind_rows(weight)
   weight <- weight %>%
     select(., -logId, -source)
+  
   return(weight)
+  
 }
 
-#----------------------------------------------------------------------------------------------------------------------
-###format so it fits in DB
+# download sleep data for each day--------------------------------------------------------------------------------------
 getSleepData <- function(dates){
   token <- getToken()
   
@@ -131,8 +144,7 @@ getSleepData <- function(dates){
   return(sleep)
 }
  
-#-----------------------------------------------------------------------------------------------------------------------
-# download activity data 
+# download activity data------------------------------------------------------------------------------------------------
 getActivityData <- function(dates){
   token <- getToken()
   
@@ -150,6 +162,7 @@ getActivityData <- function(dates){
   })
   
   act_sum <- bind_rows(act_sum)
+  
   return(act_sum)
   
 }  

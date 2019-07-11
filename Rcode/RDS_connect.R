@@ -1,5 +1,6 @@
 ## Functions that interface with database on AWS. 
-#======================================================================================================================
+
+#=======================================================================================================================
 # connect to database 
 # returns a connection object
 connectDB <- function(){
@@ -18,7 +19,7 @@ connectDB <- function(){
 # Queries DB for last date in table-------------------------------------------------------------------------------------
 # table_name = character string with name of table in DB to add data
 # need ` ` for date column in MySQL
-getTableDate <- function(table_name){
+getTableLastUpdateDate <- function(table_name){
   
   # create connection object
   con <- connectDB()
@@ -31,7 +32,9 @@ getTableDate <- function(table_name){
   
   # close connection
   RMariaDB::dbDisconnect(con)
+  
   return(date)
+  
 }
   
 # Insert data into table------------------------------------------------------------------------------------------------
@@ -54,9 +57,9 @@ insertDataDB <- function(API_data, table_name){
   RMariaDB::dbDisconnect(con)
 }
 
-
-# Get status info for table in DB
-GetTableInfo <- function(table_name){
+# Get status info for table in DB---------------------------------------------------------------------------------------
+# table_name = character string with name of table in DB to add data
+getTableInfo <- function(table_name){
   
   # create connection object
   con <- connectDB()

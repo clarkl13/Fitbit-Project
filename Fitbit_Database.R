@@ -1,4 +1,4 @@
-#Update Fitbit Database 
+#Update Fitbit Database on AWS
 
 #=======================================================================================================================
 
@@ -14,8 +14,9 @@ options(scipen = 999)
 # load in database function---------------------------------------------------------------------------------------------
 source("Rcode/RDS_connect.R") 
 # functions:  connectDB returns DB connection to my AWS RDS fitbit DB
-#             getDataTable returns last date of data entered into table in DF
+#             getTableLastUpdateDate returns last date of data entered into table in DF
 #             insertDataDB inserts DF into table specified
+#             getTableinfo returns stats about specified table in DB
 
 # today's date
 date_today <- Sys.Date()
@@ -24,7 +25,7 @@ date_today <- Sys.Date()
 tables <- c("steps", "heart.rate", "activity", "calories", "sleep.stages", "weight")
 
 # Loop over tables and get last date in each table bind data into DF with names of tables from DB
-last_entered_dates <- lapply(tables, getTableDate)
+last_entered_dates <- lapply(tables, getTableLastUpdateDate)
 last_entered_dates <- bind_rows(last_entered_dates)
 last_entered_dates$table <- tables
 
@@ -38,6 +39,7 @@ source("Rcode/fitbitAPI.R")
 #             getSleepData returns DF of sleep data
 #             getStepsData returns DF of steps data
 #             getWeightData returns DF of weight logs
+
 
 
 # loop over DF 
@@ -78,7 +80,7 @@ updateDB <- apply(last_entered_dates, 1, function(x){
       data <- getWeightData(dates_to_pull)
     }
     
-    # Write pulled data approp table in DB
+    # Write pulled data to approp table in DB
     DB <- insertDataDB(API_data = data, table_name = x["table"])
     
     # Returns a list of NULL or TRUE, NULL dates match, TRUE it updated or No data pulled for that date range 
